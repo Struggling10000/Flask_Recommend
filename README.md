@@ -1,6 +1,6 @@
 # Flask_Recommend
 
-> A Vue.js project
+> Flask project
 
 ## Build Setup
 
@@ -19,5 +19,3 @@ python3 server.py
 
 
 ```
-
-# Flask_Recommend
