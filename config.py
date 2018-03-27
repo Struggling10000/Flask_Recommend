@@ -1,4 +1,4 @@
-db_host = 'localhost'
+db_host = '192.168.90.171'
 db_user = 'tabzjh'
-db_password = '1234567899'
+db_password = 'hadoop'
 db_name = 'commodititem'

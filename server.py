@@ -2,25 +2,35 @@
 # -*- coding:utf-8 -*-
 
 import json
+import uuid
 
 import pymysql
 from flask import *
 from flask_cors import *
-from bean import User
+
 # import CFAlgorithm
 import mysql
+from bean import User
 
 """webapp"""
 
 app = Flask(__name__)
+app.secret_key = 'flaskapp'
+# 设置跨域访问
 CORS(app, supports_credentials=True)
 
 mysql = mysql.mysql()
 
 
+''' @app.before_request
+def direct():
+    pass '''
+
+
 @app.route("/")
 def index():
-    return "recommend"
+    print(uuid.uuid1())
+    return "/"
 
 # 注册
 @app.route("/reg", methods=["POST"])
@@ -43,8 +53,16 @@ def signUp():
         user.userName = name
         user.userPassword = psw
         user.userSex = sex
-        result = mysql.insertIntoUser(user)
-        # if not (x is None)
+        u = mysql.selectFromUserByUsername(user.userName)
+        result = None
+        if not u.userName:
+            result = mysql.insertIntoUser(user)
+        else:
+            return jsonify({
+                'code': 207,
+                'data': "user is exits"
+            })
+        # if not (result is None)
         if not result:
             return jsonify({
                 'code': 204,
@@ -56,14 +74,13 @@ def signUp():
                 'data': "success"
             })
         return jsonify({
-                'code': 205,
-                'data': "all file"
-            })
+            'code': 205,
+            'data': "all file"
+        })
 
 # 登陆
 @app.route("/login", methods=["POST"])
 def signIn():
-
     if request.method == "POST":
         # 参数utf-8编码再转str最后以json字符串方式变成对象
         params = json.loads(str(request.get_data().decode("utf-8")))
@@ -82,13 +99,15 @@ def signIn():
                 'code': 203,
                 'data': 'no user'
             })
-        print(psw)
-        print(user.userPassword)
         if psw == user.userPassword:
-            # 对象转dict再json字符串化
+            # 生成uuid 用做token
+            session['token'] = uuid.uuid1()
+            # 保存用户名
+            session['user'] = user.userName
             return jsonify({
                 'code': 200,
-                'data': json.dumps(user.__dict__)
+                'data': user.toJson(),
+                'token': session.get('token')
             })
         else:
             return jsonify({

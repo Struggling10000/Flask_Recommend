@@ -9,12 +9,12 @@ from bean import User
 
 class mysql(object):
     db = None
-    # 初始化连接池
+    # 初始化数据库
 
     def __init__(self):
         self.open()
 
-    # 打开池
+    # 打开数据库连接
     def open(self, url=None, user=None, password=None, dbname=None):
         try:
             if url is None:
@@ -48,7 +48,7 @@ class mysql(object):
                 self.db.rollback()
             cursor.close()
 
-    # 关闭数据库连接池
+    # 关闭数据库连接
     def close(self):
         try:
             self.db.close()
