@@ -1,4 +1,4 @@
 db_host = 'localhost'
-db_user = 'tabzjh'
-db_password = '1234567899'
+db_user = 'test'
+db_password = ''
 db_name = 'commodititem'
