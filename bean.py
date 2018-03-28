@@ -6,10 +6,23 @@ class User(dict):
     userlive = False
 
     def toJson(self):
-        return{
+        return {
             'userId': self.userId,
             'userName': self.userName,
             # 'userPassword': self.userPassword,
             'userSex': self.userSex,
             'userlive': self.userlive
+        }
+
+
+class Record(dict):
+    user_id = 0
+    itemId = None
+    item_num = 1
+
+    def toJson(self):
+        return {
+            'user_id': self.user_id,
+            'itemId': self.itemId,
+            'item_num': self.item_num
         }

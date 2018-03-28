@@ -5,7 +5,7 @@ import pymysql
 # 配置文件
 import config
 from bean import User
-
+from bean import Record
 
 class mysql(object):
     db = None
@@ -102,5 +102,19 @@ class mysql(object):
         with self.cs() as cursor:
             result = cursor.execute(sql, (user.userName, user.userPassword,
                                           user.userSex, user.userlive))
+        print(result)
+        return result
+
+    # 插入多条购物记录
+    def insertIntoRecord(self,records):
+        if records is None:
+            return
+        if len(records) < 1:
+            return
+        sql = "INSERT INTO commodititem.record VALUES(%d,%s,%d)"
+        result = None
+
+        with self.cs() as cursor:
+            result = cursor.executemany(sql,records)
         print(result)
         return result

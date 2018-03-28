@@ -16,8 +16,6 @@ from bean import User
 
 app = Flask(__name__)
 app.secret_key = 'flaskapp'
-# 设置跨域访问
-CORS(app, supports_credentials=True)
 
 mysql = mysql.mysql()
 
@@ -33,14 +31,16 @@ def index():
     return "/"
 
 # 注册
+
+
 @app.route("/reg", methods=["POST"])
 def signUp():
     if request.method == "POST":
         params = json.loads(str(request.get_data().decode("utf-8")))
         print(params)
-        name = params['user']
-        psw = params['passwd']
-        sex = params['sex']
+        name = params.get('user')
+        psw = params.get('passwd')
+        sex = params.get('sex')
         # 默认为0,即False
         if not sex:
             sex = 0
@@ -79,14 +79,16 @@ def signUp():
         })
 
 # 登陆
+
+
 @app.route("/login", methods=["POST"])
 def signIn():
     if request.method == "POST":
         # 参数utf-8编码再转str最后以json字符串方式变成对象
         params = json.loads(str(request.get_data().decode("utf-8")))
         print(params)
-        name = params['user']
-        psw = params['passwd']
+        name = params.get('user')
+        psw = params.get('passwd')
 
         if not name or not psw:
             return jsonify({
@@ -116,6 +118,8 @@ def signIn():
             })
 
 # 主页数据
+
+
 @app.route("/data")
 def getData():
     if request.method == "GET":
@@ -126,7 +130,27 @@ def getData():
             'data': data
         })
 
+# 提交购买数据
+
+
+@app.route("/buy", methods=["POST"])
+def buy():
+    if request.method == "POST":
+        params = json.loads(str(request.get_data().decode("utf-8")))
+        token = params.get('token')
+        
+        print(token)
+        if token != session.get('token'):
+            return jsonify({
+                'code': 201,
+                'data': 'auth fail'
+            })
+        records = params.get('records')
+        print(records)
+
 
 if __name__ == "__main__":
+    # 设置跨域访问
+    CORS(app, supports_credentials=True)
     app.debug = True
     app.run(host='0.0.0.0', port=9000)
