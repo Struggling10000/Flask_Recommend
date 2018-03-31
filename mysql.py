@@ -1,11 +1,13 @@
-# 上下文管理
+# 配置文件
 import contextlib
+
+# 上下文管理
 # 数据库操作库
 import pymysql
-# 配置文件
+
 import config
-from bean import User
-from bean import Record
+from bean import Record, User
+
 
 class mysql(object):
     db = None
@@ -25,8 +27,8 @@ class mysql(object):
                 password = config.db_password
             if user is None:
                 dbname = config.db_name
-            self.db = pymysql.connect(host=url, user=user, passwd=password,
-                                      db=dbname, port=3306, use_unicode=True, charset="utf8")
+            self.db = pymysql.connect(
+                url, user, password, dbname, use_unicode=True, charset="utf8")
         except Exception as e:
             print(e)
 
@@ -104,17 +106,47 @@ class mysql(object):
                                           user.userSex, user.userlive))
         print(result)
         return result
+    # 通过itemId查询购买记录
 
+    def selectFromRecordByitemId(self, itemId, user_id):
+        if itemId is None:
+            return None
+        sql = "SELECT COUNT(*) FROM commodititem.`record` WHERE itemId=%s  AND user_id=%s"
+        with self.cs() as cursor:
+            result = cursor.execute(sql % (itemId, user_id))
+        return result
     # 插入多条购物记录
-    def insertIntoRecord(self,records):
+
+    def insertIntoRecord(self, records):
         if records is None:
             return
         if len(records) < 1:
             return
-        sql = "INSERT INTO commodititem.record VALUES(%d,%s,%d)"
+        insertsql = "INSERT INTO commodititem.record(user_id,itemId,item_num) VALUES(%s,%s,%s)"
+        updatesql = "UPDATE	commodititem.`record` SET item_num= item_num+1 WHERE itemId=%s"
         result = None
-
+        # print(records)
         with self.cs() as cursor:
-            result = cursor.executemany(sql,records)
-        print(result)
+            for rs in records:
+                if not self.selectFromRecordByitemId(rs.itemId, rs.user_id):
+                    result = cursor.execute(
+                        insertsql % (rs.user_id, rs.itemId, rs.item_num))
+                else:
+                    result = cursor.execute(updatesql, rs.itemId)
+        # print(result)
         return result
+    # 查询购物记录
+
+    def selectFromRecord(self):
+        sql = "SELECT user_id,itemId,item_num FROM commodititem.`record`"
+        data = []
+        with self.cs() as cursor:
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            for row in results:
+                data.append({
+                    'user_id': row[0],
+                    'itemId': row[1],
+                    'item_num': row[2],
+                })
+        return data

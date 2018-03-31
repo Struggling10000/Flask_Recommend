@@ -16,8 +16,9 @@ class User(dict):
 
 
 class Record(dict):
+    record_id = 0
     user_id = 0
-    itemId = None
+    itemId = 0
     item_num = 1
 
     def toJson(self):

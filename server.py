@@ -11,6 +11,7 @@ from flask_cors import *
 # import CFAlgorithm
 import mysql
 from bean import User
+from bean import Record
 
 """webapp"""
 
@@ -138,15 +139,37 @@ def buy():
     if request.method == "POST":
         params = json.loads(str(request.get_data().decode("utf-8")))
         token = params.get('token')
-        
-        print(token)
-        if token != session.get('token'):
-            return jsonify({
-                'code': 201,
-                'data': 'auth fail'
-            })
+
+        # print(token)
+        # if token != session.get('token'):
+        #     return jsonify({
+        #         'code': 201,
+        #         'data': 'auth fail'
+        #     })
         records = params.get('records')
-        print(records)
+        if not records or not token:
+            return jsonify({
+                'code': 203,
+                'data': 'params error'
+            })
+
+        li = []
+        for arr in records:
+            tmprecord = Record()
+            tmprecord.user_id = arr[0]
+            tmprecord.itemId = arr[1]
+            tmprecord.item_num = arr[2]
+            li.append(tmprecord)
+        
+        if mysql.insertIntoRecord(li):
+            return jsonify({
+                'code': 200,
+                'data': 'success'
+            })
+        return jsonify({
+            'code': 201,
+            'data': 'fail'
+        })
 
 
 if __name__ == "__main__":

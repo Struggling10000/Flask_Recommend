@@ -1,0 +1,5 @@
+Set-Cookie: 
+session=
+eyJ0b2tlbiI6eyIgdSI6ImNiMzkwODY2MzQyZTExZTg4MjE5MDAxYTdkZGE3MTBiIn0sInVzZXIiOiJ0YWJ6amgifQ.DZ_oxQ.r8Og34Q6oj7VHS6tbaD2A_I3HP0;
+HttpOnly;
+Path=/

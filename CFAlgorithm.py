@@ -30,7 +30,7 @@ class CFAlgorithm:
     # input : 商品ID  数据文件路径
     def __init__(self, itemID, path=None):
         if path is None:
-            path = sys.path[0] + '\data.txt'
+            path = sys.path[0] + '/data.txt'
             print(path)
         try:
             self.loadData(path)
@@ -39,7 +39,7 @@ class CFAlgorithm:
             print("无法加载数据文件:" + path)
             exit(1)
         self.splitData(self.data)
-        self.train(itemID)
+        
 
     # 计算vector与data中每一个向量数据的相关系数
     def calRelation(self, vector, data):
@@ -64,8 +64,8 @@ class CFAlgorithm:
     # 加载数据
     # D:\Project\Python\work_py\data.txt
     # 格式: 用户ID 商品ID 商品数量
-    def loadData(self, path):
-        self.data = numpy.loadtxt(path)
+    def loadData(self, data):
+        self.data = data
         # 取前2列 x_p
         # 用户ID与商品ID
         self.userIDAndItemID = self.data[:, :2]
@@ -81,13 +81,13 @@ class CFAlgorithm:
         self.Item_likeness = numpy.zeros((self.nItem, self.nItem))
         # print(Item_likeness)
 
-    # 加载数据集，切分数据集80%训练，20%测试
+    # 加载数据集
     def splitData(self, data):
         self.x = (scipy.sparse.csc_matrix((self.itemNum, self.userIDAndItemID.T)).astype(float))[
             :, :].todense()
 
     # 计算
-    def train(self, itemID):
+    def calculate(self, itemID):
         if itemID == None:
             raise ValueError
             exit(1)
@@ -99,8 +99,4 @@ class CFAlgorithm:
         for t in range(self.Item_likeness.shape[1]):
             if itemID == t:
                 item = self.Item_likeness[t].argsort()[-3:]
-                print("Buy Item %d will buy item %d,%d,%d " %
-                      (t, item[0], item[1], item[2]))
-                break
-
-
+                return item
