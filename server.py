@@ -8,11 +8,11 @@ import pymysql
 from flask import *
 from flask_cors import *
 
-# import CFAlgorithm
+import CF
 import mysql
 from bean import User
 from bean import Record
-
+from bean import RecommendItem
 """webapp"""
 
 app = Flask(__name__)
@@ -160,7 +160,7 @@ def buy():
             tmprecord.itemId = arr[1]
             tmprecord.item_num = arr[2]
             li.append(tmprecord)
-        
+
         if mysql.insertIntoRecord(li):
             return jsonify({
                 'code': 200,
@@ -170,6 +170,31 @@ def buy():
             'code': 201,
             'data': 'fail'
         })
+
+
+@app.route("/recommend", methods=["GET"])
+def recommend():
+    if request.method == "GET":
+        token = request.args.get("token")
+        if(token):
+            cfItem = CF.CFItem()
+            li = cfItem.recommend()
+            # for i in li:
+            #     print(i)
+            #     tmp = RecommendItem()
+            #     tmp.itemId = i[0]
+            #     tmp.recommendlist = i[1:]
+            #     data.append(tmp)
+            print(li)
+            return jsonify({
+                'code': 200,
+                'data': li
+            })
+        else:
+            return jsonify({
+                'code': 203,
+                'data': 'params error'
+            })
 
 
 if __name__ == "__main__":

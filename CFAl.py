@@ -27,19 +27,16 @@ class CFAlgorithm:
     x = [[]]
     y = [[]]
 
-    # input : 商品ID  数据文件路径
-    def __init__(self, itemID, path=None):
-        if path is None:
-            path = sys.path[0] + '/data.txt'
-            print(path)
-        try:
-            self.loadData(path)
-        except FileNotFoundError as e:
-            print(e)
-            print("无法加载数据文件:" + path)
-            exit(1)
-        self.splitData(self.data)
-        
+    def __init__(self, records):
+        if len(records) < 1:
+            raise ValueError
+        li = []
+        for record in records:
+            tmp = [record.get("user_id"), record.get("itemId"), record.get("item_num")]
+            li.append(tmp)
+        print(li)
+        self.loadData(li)
+        self.splitData()
 
     # 计算vector与data中每一个向量数据的相关系数
     def calRelation(self, vector, data):
@@ -58,14 +55,14 @@ class CFAlgorithm:
         xs_ = X.std(1)
         n = float(len(y))
         ys_ += 1e-5  # Handle zeros in ys
-        xs_ += 1e-5  # Handle zeros in x
+        xs_ += 1e-5  # Handle zeros in x    
         return (xy - x_ * y_ * n) / n / xs_ / ys_
 
     # 加载数据
     # D:\Project\Python\work_py\data.txt
     # 格式: 用户ID 商品ID 商品数量
     def loadData(self, data):
-        self.data = data
+        self.data = numpy.array(data)
         # 取前2列 x_p
         # 用户ID与商品ID
         self.userIDAndItemID = self.data[:, :2]
@@ -81,22 +78,22 @@ class CFAlgorithm:
         self.Item_likeness = numpy.zeros((self.nItem, self.nItem))
         # print(Item_likeness)
 
-    # 加载数据集
-    def splitData(self, data):
+    # 加载数据集，切分数据集80%训练，20%测试
+    def splitData(self):
         self.x = (scipy.sparse.csc_matrix((self.itemNum, self.userIDAndItemID.T)).astype(float))[
             :, :].todense()
 
     # 计算
-    def calculate(self, itemID):
-        if itemID == None:
-            raise ValueError
-            exit(1)
+    def train(self):
         for i in range(self.nItem):
             self.Item_likeness[i] = self.calRelation(
                 self.x[:, i].T, self.x.T)
             self.Item_likeness[i, i] = -1
-
+        li = []
         for t in range(self.Item_likeness.shape[1]):
-            if itemID == t:
-                item = self.Item_likeness[t].argsort()[-3:]
-                return item
+            item = self.Item_likeness[t].argsort()[-3:]
+            tmp = [t, item.tolist()]
+            li.append(tmp)
+        return li
+            # print("Buy Item %d will buy item %d,%d,%d " %
+            #       (t, item[0], item[1], item[2]))

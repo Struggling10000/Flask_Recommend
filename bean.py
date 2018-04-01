@@ -16,9 +16,9 @@ class User(dict):
 
 
 class Record(dict):
-    record_id = 0
-    user_id = 0
-    itemId = 0
+    record_id = 0.0
+    user_id = 0.0
+    itemId = 0.0
     item_num = 1
 
     def toJson(self):
@@ -27,3 +27,8 @@ class Record(dict):
             'itemId': self.itemId,
             'item_num': self.item_num
         }
+
+
+class RecommendItem(dict):
+    itemId = 0,
+    recommendlist = []

@@ -113,8 +113,9 @@ class mysql(object):
             return None
         sql = "SELECT COUNT(*) FROM commodititem.`record` WHERE itemId=%s  AND user_id=%s"
         with self.cs() as cursor:
-            result = cursor.execute(sql % (itemId, user_id))
-        return result
+            cursor.execute(sql % (itemId, user_id))
+            result = cursor.fetchone()
+        return result[0]
     # 插入多条购物记录
 
     def insertIntoRecord(self, records):
@@ -128,7 +129,8 @@ class mysql(object):
         # print(records)
         with self.cs() as cursor:
             for rs in records:
-                if not self.selectFromRecordByitemId(rs.itemId, rs.user_id):
+                count = self.selectFromRecordByitemId(rs.itemId, rs.user_id)
+                if not count:
                     result = cursor.execute(
                         insertsql % (rs.user_id, rs.itemId, rs.item_num))
                 else:
